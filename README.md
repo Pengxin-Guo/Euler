@@ -65,6 +65,72 @@ int main() {
 }
 ```
 
+**Problem 5. Smallest multiple**
 
+思路：`a`和`b`的最小公倍数等于`a * b / gcb(a, b)`，其中`gcb`代表最大公约数。这个题给出了最小的能够被被`1`到`10`整除的数是`2520`，故我们只需从`11`开始计算即可。
 
- 
+```c
+int64_t gcb(int64_t a, int64_t b) {
+    if (b == 0) return a;
+    return gcb(b, a % b);
+}
+
+int main() {
+    int64_t ans = 2520;
+    for (int64_t i = 11; i <= 20; i++) {
+        ans = ans * i / gcb(ans, i);
+    }
+    printf("%" PRId64 "\n", ans);
+    return 0;
+}
+```
+
+**Problem 6. Sum square difference**
+
+ 思路：平方和公式为：1<sup>2</sup> + 2<sup>2</sup> + ... + n<sup>2</sup> = n * (n + 1) * (2 * n + 1) / 6。
+
+```c
+int64_t num1 = 100 * (100 + 1) / 2, num2 = 100 * (100 + 1) * (2 * 100 + 1) / 6;
+printf("%" PRId64 "\n", num1 * num1 - num2);
+```
+
+**Problem 7. 10001st prime**
+
+思路：线性筛。
+
+```c
+void init() {
+    for (int i = 2; i < MAX_N; i++) {
+        if (!prime[i]) {
+            prime[++prime[0]] = i;
+        }
+        for (int j = 1; i * prime[j] < MAX_N && j <= prime[0]; j++) {
+            prime[i * prime[j]] = 1;
+            if (i % prime[j] == 0) break;
+        }
+    }
+    return ;
+}
+```
+
+**Problem 8. Largest product in a series**
+
+思路：滑动窗口法。设置窗口大小为`13`，并且记录一下这个窗口里面`0`的个数，处理`0`这个数字只需将`0`的个数加一（入窗口）或减一（出窗口）就行，而不需要计算到最终结果里面。
+
+```c
+int64_t ans = 0, zero = 0, p = 1;
+for (int64_t i = 0; i < MAX_N; i++) {
+    if (num[i] == '0') zero += 1;
+    else p *= (num[i] - '0');
+    if (i >= 13) {
+        if (num[i - 13] == '0') {
+            zero -= 1;
+        }
+        else {
+            p /= (num[i - 13] - '0');
+        }
+    }
+    if (zero == 0 && ans < p) ans = p;
+}
+```
+
