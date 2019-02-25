@@ -134,3 +134,121 @@ for (int64_t i = 0; i < MAX_N; i++) {
 }
 ```
 
+**Problem 9. Special Pythagorean triplet**
+
+思路：毕达哥拉斯三元数组（勾股数组）：`a * a + b * b = c * c`；满足以下性质，若`a`为偶数，则存在正整数`i`、`j`，使`a = 2 * i * j`、`b = j * j - i * i`、`c = j * j + i * i`成立。
+
+```c
+for (int i = 1; i < 32; i++) {
+    for (int j = i + 1; j < 32; j++) {
+        int a = 2 * i * j;
+        int b = j * j - i * i;
+        int c = j * j + i * i;
+        if (1000 % (a + b + c) == 0){
+            int e = 1000 / (a + b + c);
+            printf("%d\n", a * b * c * e * e * e);
+            return 0;
+        }
+    }
+}
+```
+
+**Problem 10. Summation of primes**
+
+思路：线性筛，一边判断是否是素数，一边求解答案。
+
+```c
+int prime[MAX_N + 5] = {0};
+int64_t ans = 0;
+for (int i = 2; i < MAX_N; i++) {
+    if (!prime[i]) {
+        prime[++prime[0]] = i;
+        ans += i;
+    }
+    for (int j = 1; i * prime[j] <= MAX_N && j <= prime[0]; j++) {
+        prime[i * prime[j]] = 1;
+        if (i % prime[j] == 0) break;
+    }
+}
+printf("%" PRId64 "\n", ans);
+```
+
+**Problem 11. Summation of primes**
+
+思路：循环，暴力求解即可。
+
+```c
+int dir_arr[4][2] = {
+    1, 1, 1, -1,
+    0, 1, 1, 0
+};
+
+int main() {
+    int num[30][30] = {0}, ans = 0;
+    for (int i = 5; i < 25; i++) {
+        for (int j = 5; j < 25; j++) {
+            scanf("%d", num[i] + j);
+        }
+    }
+    for (int x = 5; x < 25; x++) {
+        for (int y = 5; y < 25; y++) {
+            for (int k = 0; k < 4; k++) {
+                int p = 1;
+                for (int step = 0; step < 4; step++) {
+                    int xx = x + step * dir_arr[k][0];
+                    int yy = y + step * dir_arr[k][1];
+                    p *= num[xx][yy];
+                }
+                if (p > ans) ans = p;
+            }
+        }
+    }
+    printf("%d\n",ans);
+    return 0;
+}
+```
+
+**Problem 12. Highly divisible triangular number**
+
+思路：第`n`个三角形数为`n * (n + 1) / 2` ，可以写成`a * b`的形式，`a * b`的因数个数等于`a`的因数个数乘以`b`的因数个数再减去重复的。利用线性筛可以求出每个数的因子个数。
+
+```c
+int prime[MAX_N + 5] = {0};
+int dnum[MAX_N + 5] = {0}; //记录每个数字的因子个数
+int mnum[MAX_N + 5] = {0}; //记录每个数字的最小因子的幂次
+
+void init() {
+    for (int i = 2; i < MAX_N; i++) {
+        if (!prime[i]) {
+            prime[++prime[0]] = i;
+            dnum[i] = 2;
+            mnum[i] = 1;
+        }
+        for (int j = 1; i * prime[j] <= MAX_N && j <= prime[0]; j++) {
+            prime[i * prime[j]] = 1;
+            if (i % prime[j] == 0) {
+                dnum[i * prime[j]] = dnum[i] / (mnum[i] + 1) * (mnum[i] + 2);
+                mnum[i * prime[j]] = mnum[i] + 1;
+                break;
+            }
+            dnum[i * prime[j]] = dnum[i] * dnum[prime[j]];
+            mnum[i * prime[j]] = 1;
+        }
+    }
+    return ;
+}
+
+int factor_nums(int n) {
+    if (n & 1) return dnum[n] * dnum[(n + 1) / 2];
+    else return dnum[n / 2] * dnum[n + 1];
+}
+
+int main() {
+    init();
+    int n = 1;
+    while (factor_nums(n) < 500) n++;
+    printf("%d\n", n * (n + 1) / 2);
+    return 0;
+}
+```
+
