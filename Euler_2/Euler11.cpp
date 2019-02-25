@@ -16,7 +16,7 @@ int main() {
     int num[30][30] = {0}, ans = 0;
     for (int i = 5; i < 25; i++) {
         for (int j = 5; j < 25; j++) {
-            scanf("%d",num[i] + j);
+            scanf("%d", num[i] + j);
         }
     }
     for (int x = 5; x < 25; x++) {
