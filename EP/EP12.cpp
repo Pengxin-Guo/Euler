@@ -17,7 +17,7 @@ void init() {
         if (!prime[i]) {
             prime[++prime[0]] = i;
             dnum[i] = 2;
-            mnum[i] = 2;
+            mnum[i] = 1;
         }
         for (int j = 1; j <= prime[0] && i * prime[j] <= MAX_N; j++) {
             prime[i * prime[j]] = 1;
