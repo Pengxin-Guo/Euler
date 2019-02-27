@@ -252,3 +252,254 @@ int main() {
 }
 ```
 
+**Problem 13.Large sum**
+
+思路：大数加法
+
+```c
+char num[55];
+int ans[55] = {1, 0};
+
+int main() {
+    for (int i = 0; i < 100; i++) {
+        scanf("%s", num);
+        int len = strlen(num);
+        if (ans[0] < len) ans[0] = len;
+        for (int j = 0; j < len; j++) {
+            ans[len - j] += (num[j] - '0');
+        }
+        for (int j = 1; j <= ans[0]; j++) {
+            if (ans[j] < 10) continue;
+            ans[j + 1] += ans[j] / 10;
+            ans[j] %= 10;
+            ans[0] += (j == ans[0]);
+        }
+    }
+    for (int i = ans[0]; i > ans[0] - 10; i--) {
+        printf("%d", ans[i]);
+    }
+    printf("\n");
+    return 0;
+}
+```
+
+**Problem 14.Longest Collatz sequence**
+
+思路：打个表，计算一下一百万以内的所有数字的迭代数列的长度即可。
+
+```c
+int selength[MAX_N + 5] = {0};
+
+int sequ_length(int64_t i) {
+    if (i == 1) return 1;
+    if (i <= MAX_N && selength[i]) return selength[i];
+    int temp;
+    if (i & 1) temp = sequ_length(3 * i + 1) + 1;
+    else temp = sequ_length(i / 2) + 1;
+    if (i <= MAX_N) selength[i] = temp;
+    return temp;
+}
+```
+
+**Problem 15.Lattice paths**
+
+思路：递推，`dp[i][j]`代表从左上角出发走到`[i][j]`这个位置的路径条数，则递推公式为`dp[i][j] = dp[i - 1][j] + dp[i][j - 1]`，其中`dp[1][1] = 1`。
+
+```c
+int64_t num[22][22] = {0};
+for (int i = 1; i < 22; i++) {
+    for (int j = 1; j < 22; j++) {
+        if (i == 1 && j == 1) num[i][j] = 1;
+        else num[i][j] = num[i - 1][j] + num[i][j - 1];
+    }
+}
+printf("%" PRId64 "\n",num[21][21]);
+```
+
+**Problem 16.Power digit sum**
+
+思路：大数加法。
+
+```c
+int data[300] = {1, 1};
+int ans = 0;
+for (int i = 0; i < 1000; i++) {
+    for (int j = 1; j <= data[0]; j++) {
+        data[j] *= 2;
+    }
+    for (int j = 1; j <= data[0]; j++) {
+        if (data[j] < 10) continue;
+        data[j + 1] += data[j] / 10;
+        data[j] %= 10;
+        data[0] += (j == data[0]);
+    }
+}
+for (int i = 1; i <= data[0]; i++) {
+    ans += data[i];
+}
+printf("%d\n", ans);
+```
+
+**Problem 17.Number letter counts**
+
+思路：把`1`到`20`这几个数字单词和`10、20、30...90`这些数字单词的字母个数存在数组里面，其余的数均可以利用这些得到。
+
+```c
+int ln20[20] = {
+    0, 3, 3, 5, 4, 4, 3, 5, 5, 4, 3,
+    6, 6, 8, 8, 7, 7, 9, 8, 8,
+};
+int ln_10[10] = {
+    0, 0, 6, 6, 5, 5, 5, 7, 6, 6
+};
+
+int get_letter_num(int i) {
+    if (i < 20) {
+        return ln20[i];
+    } else if (i < 100) {
+        return ln_10[i / 10] + ln20[i % 10];
+    } else if (i < 1000) {
+        int temp = get_letter_num(i % 100);
+        if (temp != 0) temp += 3;
+        return temp + ln20[i / 100] + 7;
+    } else {
+        return 11;
+    }
+}
+```
+
+**Problem 18.Maximum path sum I**
+
+思路：从下向上计算，则最后最上面的元素则是我们要求的答案。
+
+```c
+for (int i = MAX_N - 2; i >= 0; i--) {
+    for (int j = 0; j <= i; j++) {
+        data[i][j] += (data[i + 1][j] > data[i + 1][j + 1]) ? data[i + 1][j] : data[i + 1][j + 1];
+    }
+}
+printf("%d\n", data[0][0]);
+```
+
+**Problem 19.Counting Sundays**
+
+思路：模拟日期即可，关键函数为下方的`get_next_data`。
+
+```c
+int days[13] = {
+    0, 31, 28, 31, 
+    30, 31, 30, 31, 
+    31, 30, 31, 30, 31
+};
+
+int leap_year(int y) {
+    return (y % 4 == 0 && y % 100) || (y % 400 == 0);
+}
+
+int get_next_data(int y, int m, int d) {
+    d += 1;
+    if (d > days[m] + (m == 2 && leap_year(y))) {
+        d = 1;
+    }
+    return d;
+}
+
+int main() {
+    int ans = 0, y = 1900, m = 1, d = 1, w = 1;
+    do {
+        d = get_next_data(y, m, d);
+        m += (d == 1);
+        y += (m == 13 && (m = 1));
+        w += 1;
+        w %= 7;
+        // printf("%d-%d-%d\n", y, m, d);
+        if (w == 0 && d == 1 && y > 1900) ans += 1;
+    } while (y != 2000 || m != 12 || d != 31);
+    printf("%d\n", ans);
+    return 0;
+}
+```
+
+**Problem 20.Factorial digit sum**
+
+思路：大数相乘，与大数相加类似。
+
+```c
+for (int i = 1; i <= 100; i++) {
+    for (int j = 1; j <= data[0]; j++) {
+        data[j] *= i;
+    }
+    for (int j = 1; j <= data[0]; j++) {
+        if (data[j] < 10) continue;
+        data[j + 1] += data[j] / 10;
+        data[j] %= 10;
+        data[0] += (j == data[0]);
+    }
+}
+int ans = 0;
+for (int i = 1; i <= data[0]; i++) {
+    ans += data[i];
+}
+```
+
+**Problem 21.Amicable numbers**
+
+ 思路：在线性筛的模板上面加一些代码，先把每个数的因数和求出来。
+
+```c
+int prime[MAX_N + 5] = {0}; 
+int dnum[MAX_N + 5] = {0}; //dnum[i]代表i的因数和
+int mnum[MAX_N + 5] = {0}; //mnum[i]代表i的最小素因数的次幂
+
+void init() {
+    for (int i = 2; i <= MAX_N; i++) {
+        if (!prime[i]) {
+            prime[++prime[0]] = i;
+            dnum[i] = i + 1;
+            mnum[i] = 1;
+        }
+        for (int j = 1; j <= prime[0] && i * prime[j] <= MAX_N; j++) {
+            prime[i * prime[j]] = 1;
+            if (i % prime[j] == 0) {
+                mnum[i * prime[j]] = mnum[i] + 1;
+                dnum[i * prime[j]] = dnum[i] * (1 - (int)pow(prime[j], mnum[i] + 2)) / (1 - (int)pow(prime[j], mnum[i] + 1));
+                break;
+            }
+            dnum[i * prime[j]] = dnum[i] * dnum[prime[j]];
+            mnum[i * prime[j]] = 1;
+        }
+    }
+    return ;
+}
+```
+
+**Problem 22.Names score**
+
+思路：将所有的名字按照字典序排个序，再计算所有名字的得分，最后求最大值即可。
+
+```c++
+int64_t i = 0, ans = 0;
+while (nameList[i].length() != 0) i++;
+std::sort(nameList, nameList + i);
+i = 0;
+while (nameList[i].length() != 0) {
+    int64_t sum = 0;
+    for (int j = 0; j < nameList[i].length(); j++) {
+        sum += nameList[i][j] - 'A' + 1;
+    }
+    ans += sum * (i + 1);
+    i++;
+}
+printf("%" PRId64 "\n", ans);
+```
+
+
+
+ 
+
+ 
+
+
+
+
+
