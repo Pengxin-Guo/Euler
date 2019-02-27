@@ -31,6 +31,7 @@ void init() {
             mnum[i * prime[j]] = 1;
         }
     }
+    return ;
 }
 
 int main() {
