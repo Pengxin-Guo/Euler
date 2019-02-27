@@ -8,10 +8,6 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-int max(int a, int b) {
-    return a > b ? a : b;
-}
-
 int main() {
 
     int64_t num[22][22] = {0};
