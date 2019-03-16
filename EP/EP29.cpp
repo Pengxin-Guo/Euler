@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #define MAX_N 10000
 #define MAX_M 210
 
@@ -37,6 +38,11 @@ int find(int *temp) {
 }
 
 int main() {
+    time_t t;
+    char buf[1024];
+    time(&t);
+    ctime_r(&t, buf);
+    printf("%s", buf);
     for (int a = 2; a <= 100; a++) {
         for (int b = 2; b <= 100; b++) {
             int *temp = cal_num(a, b);
@@ -48,5 +54,8 @@ int main() {
         }
     }
     printf("%d\n", ret);
+    time(&t);
+    ctime_r(&t, buf);
+    printf("%s", buf);
     return 0;
 }
