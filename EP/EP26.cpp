@@ -9,10 +9,10 @@
 #include <string.h>
 #define MAX_N 1000
 
-int num[MAX_N] = {0};
+int num[MAX_N + 5] = {0};
 
 int get_length(int d) {
-    memset(num, 0, sizeof(int) * MAX_N);
+    memset(num, 0, sizeof(num));
     int y = 1, n = 0;
     while (y && num[y] == 0) {
         num[y] = n;
