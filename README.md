@@ -493,13 +493,137 @@ while (nameList[i].length() != 0) {
 printf("%" PRId64 "\n", ans);
 ```
 
+**Problem 24.Lexicographic permutations**
 
+思路：调用`c++`中的内置函数`next_permutatio` 即可。
 
- 
+```c++
+int num[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+for (int i = 0; i < MAX_N - 1; i++) {
+    next_permutation(num, num + 10);
+}
+for (int i = 0; i < 10; i++) {
+    cout << num[i];
+}
+cout << endl;
+```
 
- 
+**Problem 25.1000-digit Fibonacci number**
 
+思路：利用循环数组存储斐波那契数列，配上大数相加。
 
+```c++
+while (f[n % 3][0] < 1000) {
+    n += 1;
+    int *a = f[n % 3], *b = f[(n - 1) % 3], *c = f[(n - 2) % 3];
+    a[0] = b[0];
+    for (int i = 1; i <= b[0]; i++) {
+        a[i] = b[i] + c[i];
+    }
+    for (int i = 1; i <= a[0]; i++) {
+        if (a[i] < 10) continue;
+        a[i + 1] += a[i] / 10;
+        a[i] %= 10;
+        a[0] += (i == a[0]);
+    }
+}
+printf("%d\n", n);
+```
 
+**Problem 26.Reciprocal cycles**
 
+思路：写一个循环，计算出每个数的循环节的长度，关键代码为计算数字的循环节的长度。
+
+```c++
+int get_length(int d) {
+    memset(num, 0, sizeof(int) * MAX_N);
+    int y = 1, n = 0;
+    while (y && num[y] == 0) {
+        num[y] = n;
+        y = y * 10 % d;
+        n++;
+    }
+    return y ? n - num[y] : 0;
+}
+```
+
+**Problem 28.Number spiral diagonals**
+
+思路：找出规律，求出通项即可。
+
+```c++
+int ans = 1;
+for (int i = 3; i <= 1001; i += 2) {
+    ans += 4 * i * i - 6 * i + 6;
+}
+printf("%d\n", ans);
+```
+
+**Problem 29.Distinct powers**
+
+思路：暴力循环一遍即可，记得用大数相乘。
+
+```c++
+int *cal_num(int a, int b) {
+    int *temp = (int *)calloc(sizeof(int), MAX_M);
+    temp[0] = temp[1] = 1;
+    for (int i = 0; i < b; i++) {
+        for (int j = 1; j <= temp[0]; j++) temp[j] *= a;
+        for (int j = 1; j <= temp[0]; j++) {
+            if (temp[j] < 10) continue;
+            temp[j + 1] += temp[j] / 10;
+            temp[j] %= 10;
+            temp[0] += (j == temp[0]);
+        }
+    }
+    return temp;
+}
+
+int find(int *temp) {
+    for (int i = 0; i < ret; i++) {
+        if (memcmp(result[i], temp, sizeof(int) * MAX_M) == 0) return 1;
+    }
+    return 0;
+}
+
+int main() {
+    for (int a = 2; a <= 100; a++) {
+        for (int b = 2; b <= 100; b++) {
+            int *temp = cal_num(a, b);
+            if (!find(temp)){
+                result[ret++] = temp;
+            } else {
+                free(temp);
+            }
+        }
+    }
+    printf("%d\n", ret);
+    return 0;
+}
+```
+
+**Problem 30.Digit fifth powers**
+
+思路：暴力循环所有的数字即可。
+
+```c++
+int is_valid(int n) {
+    int temp = n, num = 0;
+    while (temp) {
+        num += pow(temp % 10, 5);
+        temp /= 10;
+    }
+    return num == n;
+}
+
+int main() {
+    int ans = 0;
+    for (int i = 2; i < MAX_N; i++) {
+        if (!is_valid(i)) continue;
+        ans += i;
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
 
