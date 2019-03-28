@@ -26,7 +26,6 @@ int main() {
             if (a[1] == b[0] && i * b[1] == j * a[0]){
                 numa *= i;
                 numb *= j;        }
-            
         }
     }
     printf("%d\n", numb / gcd(numa, numb));
