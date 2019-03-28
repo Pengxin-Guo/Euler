@@ -9,7 +9,7 @@
 #include <math.h>
 #define MAX_N 100000
 
-int num[MAX_N + 5] = {0};
+int nums[MAX_N + 5] = {0};
 
 int digit(int x) {
     return floor(log10(x)) + 1;
@@ -40,8 +40,8 @@ int main() {
             if (digit(a) + digit(b) + digit(a * b) < 9) continue;
             if (is_pandigital(a, b, a * b)) {
                 printf("%d *  %d = %d\n", a, b, a * b);
-                ans += (a * b) * (1 - num[a * b]);
-                num[a * b] = 1;
+                ans += (a * b) * (1 - nums[a * b]);
+                nums[a * b] = 1;
             }
         }
     }
