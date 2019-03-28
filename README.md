@@ -627,3 +627,239 @@ int main() {
 }
 ```
 
+**Problem 31.Coin sums**
+
+思路：动态规划。`dp[i][j]`代表用前`i`种钱币组成`j`的方法种数，则`dp[i][j] = dp[i - 1][j] + dp[i][j - w[i]]`（不用用第`i`种钱币和用第`i`种钱币），下面的代码实现是进行了状态压缩之后的。
+
+```c++
+int dp[205] = {0};
+int w[8] = {1, 2, 5, 10, 20, 50, 100, 200};
+
+int main() {
+    dp[0] = 1;
+    for (int i = 0; i < 8; i++) {
+        for (int j = w[i]; j <= 200; j++) {
+            dp[j] += dp[j - w[i]];
+        }
+    }
+    printf("%d\n", dp[200]);
+    return 0;
+}
+```
+
+**Problem 32.Pandigital products**
+
+思路：暴力枚举即可。下述代码实现中还用了一点小技巧，先判断他们所有数字的位数之和是否是`9`，如果不是的话直接跳过就行，是的话再继续判断；重复数字那个用一个数组来标记就行。
+
+```c++
+int nums[MAX_N + 5] = {0};
+
+int digit(int x) {
+    return floor(log10(x)) + 1;
+}
+
+int is_valid(int a, int *num) {
+    while (a) {
+        if (a % 10 == 0) return 0;
+        if (num[a % 10]) return 0;
+        num[a % 10] = 1;
+        a /= 10;
+    }
+    return 1;
+}
+
+int is_pandigital(int a, int b, int c) {
+    int num[10] = {0};
+    if (!is_valid(a, num)) return 0;
+    if (!is_valid(b, num)) return 0;
+    if (!is_valid(c, num)) return 0;
+    return 1;
+}
+
+int main() {
+    int ans = 0;
+    for (int a = 2; 2 * digit(a) + digit(a * a) <= 9; a++) {
+        for (int b = a + 1; digit(a) + digit(b) + digit(a * b) <= 9; b++) {
+            if (digit(a) + digit(b) + digit(a * b) < 9) continue;
+            if (is_pandigital(a, b, a * b)) {
+                printf("%d *  %d = %d\n", a, b, a * b);
+                ans += (a * b) * (1 - nums[a * b]);
+                nums[a * b] = 1;
+            }
+        }
+    }
+    printf("%d\n", ans);
+}
+```
+
+**Problem 33.Digit cancelling fractions**
+
+思路：暴力枚举即可。
+
+```c++
+int numa = 1, numb = 1;
+for (int i = 11; i < 100; i++) {
+    for (int j = i + 1; j < 100; j++) {
+        int a[2] = {i / 10, i % 10}, b[2] = {j / 10, j % 10};
+        if (a[0] == b[0] || a[1] == b[1]) continue;
+        if (a[0] == b[1] && i * b[0] == j * a[1]) {
+            numa *= i;
+            numb *= j;
+            continue;
+        }
+        if (a[1] == b[0] && i * b[1] == j * a[0]){
+            numa *= i;
+            numb *= j;      
+        }
+    }
+}
+printf("%d\n", numb / gcd(numa, numb));
+```
+
+**Problem 34.Digit factorials**
+
+思路：此题也是暴力枚举，但关键是找到枚举的上界。由`9! * 8 = 2903040 `为一个`7`位数，比最小的`8`位数还要小，即超过这个数的肯定不满足题意，故这个数即为枚举的上界。
+
+```c++
+#define MAX_N 2903040
+
+int factorial(int n) {
+    int t = 1;
+    for (int i = 1; i <= n; i++) {
+        t *= i;
+    }
+    return t;
+}
+
+int is_valid(int n) {
+    int temp = n, num = 0;
+    while (temp) {
+        num += factorial(temp % 10);
+        temp /= 10;
+    }
+    return num == n;
+}
+
+int main() {
+    int ans = 0;
+    for (int i = 3; i < MAX_N; i++) {
+        if (!is_valid(i)) continue;
+        ans += i;
+    }
+    printf("%d\n", ans);
+｝
+```
+
+**Problem 35.Circular primes**
+
+思路：暴力枚举即可。
+
+```c++
+#define MAX_N 1000000
+
+int digit(int n) {
+    return floor(log10(n)) + 1;
+}
+
+int is_prime(int x) {
+    for (int n = 2; n * n <= x; n++) {
+        if (x % n == 0) return 0;
+    }
+    return 1;
+}
+
+int is_valid(int x) {
+    int n = digit(x);
+    int temp = x / (int)pow(10, n - 1) + (x % (int)pow(10, n - 1)) * 10 ;
+    while (temp != x) {
+        if (!is_prime(temp)) return 0;
+        temp = temp / (int)pow(10, n - 1) + (temp % (int)pow(10, n - 1)) * 10;
+    }
+    return 1;
+}
+
+int main() {
+    int ans = 0;
+    for (int i = 2; i < MAX_N; i++) {
+        if (!is_prime(i)) continue;
+        if (!is_valid(i)) continue;
+        //printf("%d\n", i);
+        ans += 1;
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
+
+**Problem 36.Double-base palindromes**
+
+思路：暴力枚举即可。`is_decimal`函数是检测`n`这个数在`d`进制的情况下是否是回文数的。
+
+```c++
+#define MAX_N 1000000
+
+int is_decimal(int n, int d) {
+    int temp = n, num = 0;
+    while (temp) {
+        num = d * num + (temp % d);
+        temp /= d;
+    }
+    return num == n;
+}
+
+int main() {
+    int ans = 0;
+    for (int i = 1; i < MAX_N; i++) {
+        if (!is_decimal(i, 2)) continue;
+        if (!is_decimal(i, 10)) continue;
+        ans += i;
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
+
+**Problem 37.Truncatable primes**
+
+思路：暴力枚举。这个题我们不太容易估计上界，但他给了一共有`11`个这样的数，我们可以通过计数来判断是否结束循环。
+
+```c++
+int is_prime(int x) {
+    if (x == 0 || x == 1) return 0;
+    for (int n = 2; n * n <= x; n++) {
+        if (x % n == 0) return 0;
+    }
+    return 1;
+}
+
+int digit(int n) {
+    return floor(log10(n)) + 1;
+}
+
+int is_valid(int n) {
+    int temp = n / 10;
+    while (temp) {
+        if (!is_prime(temp)) return 0;
+        temp /= 10;
+    }
+    while(n) {
+        int num = digit(n);
+        if (!is_prime(n)) return 0;
+        n = n % (int)pow(10, num - 1);
+    }
+    return 1;
+}
+
+int main() {
+    int n = 0, ans = 0;
+    for (int i = 11; i && n < 11; i++) {
+        if (!is_prime(i)) continue;
+        if (!is_valid(i)) continue;
+        ans += i;
+        n++;
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
+
