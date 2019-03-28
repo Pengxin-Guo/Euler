@@ -17,7 +17,6 @@ int main() {
         for (int j = i + 1; j < 100; j++) {
             int a[2] = {i / 10, i % 10}, b[2] = {j / 10, j % 10};
             if (a[0] == b[0] || a[1] == b[1]) continue;
-            int temp = gcd(i, j);
             if (a[0] == b[1] && i * b[0] == j * a[1]) {
                 numa *= i;
                 numb *= j;
@@ -25,7 +24,8 @@ int main() {
             }
             if (a[1] == b[0] && i * b[1] == j * a[0]){
                 numa *= i;
-                numb *= j;        }
+                numb *= j;      
+            }
         }
     }
     printf("%d\n", numb / gcd(numa, numb));
