@@ -863,3 +863,497 @@ int main() {
 }
 ```
 
+**Problem 38.Pandigital multiples**
+
+思路：暴力枚举。由题意可知循环上界不会大于`10000`。
+
+```c++
+int digit(int n) {
+    return floor(log10(n)) + 1;
+}
+
+int64_t is_valid(int a) {
+    int64_t temp = 0;
+    int n = 1;
+    int num[10] = {0};
+    while(digit(temp) < 9) {
+        int x = a * n;
+        temp = temp * pow(10, digit(a * n)) + a * n;
+        while (x) {
+            if (x % 10 == 0) return 0;
+            if (num[x % 10]) return 0;
+            num[x % 10] = 1;
+            x /= 10;
+        }
+        n++;
+    }
+    return temp;
+}
+
+int main() {
+    int64_t ans = 0;
+    for (int i = 1; i < 10000; i++) {
+        int64_t temp = is_valid(i);
+        if (ans < temp) {
+            ans = temp;
+        }
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
+
+**Problem 39.Integer right triangles**
+
+思路：循环一遍即可。关键问题是一个直角三角形三边的表示形式，一个直角三角形的三边可以表示成`a = 2 * i * j, b = j * j - i * i, c = j * j + i * i, 其中gcd(i, j) = 1`。
+
+```c++
+int gcd(int a, int b) {
+    return b ? gcd(b, a % b) : a;
+}
+
+int get_num(int p) {
+    int temp = 0;
+    for (int i = 2; i < 32; i++) {
+        for (int j = i + 1; j < 32; j++) {
+            if (gcd(i, j) != 1) continue;
+            int a = 2 * i * j;
+            int b = j * j - i * i;
+            int c = j * j + i * i;
+            if (p % (a + b + c) == 0) {
+                temp += 1;
+            }
+        }
+    }
+    return temp;
+}
+
+int main() {
+    int ans, num = 0;
+    for (int p = 12; p <= 1000; p++) {
+        if (num < get_num(p)) {
+            num = get_num(p);
+            ans = p;
+        }
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
+
+**Problem 40.Champernowne’s constant**
+
+思路：打个表，记录一下每位数字是什么即可。有一个坑是如果采取简单的先翻转数字再取模的解法，那么处理像`100`这样的数的时候就会出`bug`，所以我们不采取这种做法。我们先计算一下每个数的位数，然后再从高位到低位依次取每一位上的数字。
+
+```c++
+int n = 1;
+
+int digit(int x) {
+    return floor(log10(x)) + 1;
+}
+
+void deal(int x) {
+    int temp = x;
+    for (int i = 0; i < digit(x); i++) {
+        int num = digit(temp);
+        data[n] = temp / (int)pow(10, num - 1);
+        n += 1;
+        temp = temp % (int)pow(10, num - 1);
+    }
+    return ;
+}
+
+int main() {
+    int ans;
+    for (int i = 1; (n <= MAX_N + 2) && i < MAX_N; i++) {
+        deal(i);
+    }
+    ans = data[1] * data[10] * data[100] * data[1000] * data[10000] * data[100000] * data[1000000];
+    printf("%d\n", ans);
+    return 0;
+｝
+```
+
+**Problem 41.Pandigital prime**
+
+思路：循环一遍即可。由于要求最大的，所以我们从最大的开始，利用全排列函数来循环；当然，首先利用一下素数筛标记一下素数。
+
+```c++
+void init() {
+    for (int i = 2; i * i < MAX_N; i++) {
+        if (prime[i]) continue;
+        for (int j = i * i; j <= MAX_N; j += i) {
+            prime[j] = 1;
+        }
+    }
+}
+
+int valid(int *num, int i) {
+    int temp = 0;
+    for (int j = 0; j < i; j++) {
+        temp = temp * 10 + num[j];
+    }
+    if (prime[temp]) return 0;
+    return temp;
+}
+
+int main() {
+    init();
+    int ans = 0;
+    for (int i = 7; i > 3 && !ans; i--) {
+        for (int j = 0; j < i; j++) {
+            num[j] = i - j;
+        }
+        do {
+            ans = valid(num, i);
+        } while (!ans && prev_permutation(num, num + i));
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
+
+**Problem 42.Coded triangle numbers**
+
+思路：依次判断每个单词是不是三角形单词即可，判断的时候用二分。
+
+```c++
+int triangle(int n) {
+    return n * (n + 1) / 2;
+}
+
+int get_num(char *word) {
+    int num = 0;
+    for (int i = 0; word[i]; i++) {
+        num += word[i] - 'A' + 1;
+    }
+    return num;
+}
+
+int find(int x) {
+    int low = 0, high = 500, mid;
+    while (low <= high) {
+        mid = (low + high) >> 1;
+        if (triangle(mid) == x) return 1;
+        if (triangle(mid) < x) low = mid + 1;
+        else high = mid - 1;
+    }
+    return 0;
+}
+
+int triangle(int n) {
+    return n * (n + 1) / 2;
+}
+
+int get_num(char *word) {
+    int num = 0;
+    for (int i = 0; word[i]; i++) {
+        num += word[i] - 'A' + 1;
+    }
+    return num;
+}
+
+int find(int x) {
+    int low = 0, high = 500, mid;
+    while (low <= high) {
+        mid = (low + high) >> 1;
+        if (triangle(mid) == x) return 1;
+        if (triangle(mid) < x) low = mid + 1;
+        else high = mid - 1;
+    }
+    return 0;
+}
+
+int main() {
+    int n = sizeof(words) / 20;
+    int ans = 0;
+    for (int i = 0; i < n; i++) {
+        int temp = get_num(words[i]);
+        if (find(temp)) {
+            ans += 1;
+        }
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+int main() {
+    int n = sizeof(words) / 20;
+    int ans = 0;
+    for (int i = 0; i < n; i++) {
+        int temp = get_num(words[i]);
+        if (find(temp)) {
+            ans += 1;
+        }
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
+
+**Problem 43.Sub-string divisibility**
+
+思路：利用全排列函数，循环一遍即可。
+
+```c++
+int num[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+int prime[8] = {0, 2, 3, 5, 7, 11, 13, 17};
+
+int is_valid(int i) {
+    int temp = num[i] * 100 + num[i + 1] * 10 + num[i + 2];
+    if (temp % prime[i] == 0) return 1;
+    return 0;
+}
+
+int main() {
+    int64_t ans = 0;
+    while(std::next_permutation(num, num + 10)) {
+        if (num[0] == 0) continue;
+        int flag = 1;
+        for (int i = 1; i < 8 && flag; i++) {
+            if (!is_valid(i)) flag = 0;
+        }
+        if (flag) {
+            int64_t t = 0;
+            for (int i = 0; i < 10; i++) {
+                t = t * 10 + num[i];
+            }
+            ans += t;
+        }
+    }
+    printf("%" PRId64 "\n", ans);
+    return 0;
+}
+```
+
+**Problem 44.Pentagon numbers**
+
+思路：关键就是判断循环结束的条件。如果相邻的两个五边形数的差比我们当前得到的答案要大，那么就可以退出循环了。判读一个数是否是五边形数的时候可以用二分。谨记：数组是展开的函数，函数是压缩了的数组。
+
+```c++
+int64_t pentagonal(int64_t n) {
+    return n * (3 * n - 1) / 2;
+}
+
+int is_valid(int x, int n) {
+    int low = 0, high = n, mid;
+    while (low <= high) {
+        mid = (low + high) >> 1;
+        if (pentagonal(mid) == x) return 1;
+        if (pentagonal(mid) > x) high = mid - 1;
+        else low = mid + 1;
+    }
+    return 0;
+}
+
+int main() {
+    int64_t k = 1, j = 2;
+    int64_t ans = INT64_MAX;
+    while (pentagonal(j) - pentagonal(j - 1) < ans) {
+        k = j - 1;
+        while (k > 0 && pentagonal(j) - pentagonal(k) < ans) {
+            if (is_valid(pentagonal(j) + pentagonal(k), 2 * j)) {
+                if (is_valid(pentagonal(j) - pentagonal(k), j)) {
+                    ans = pentagonal(j) - pentagonal(k);
+                    // printf("%" PRId64 "\n", ans);
+                }
+            }
+            k--;
+        }
+        j++;
+    }
+    printf("%" PRId64 "\n", ans);
+    return 0;
+}
+```
+
+**Problem 45.Triangular, pentagonal, and hexagonal**
+
+思路：是六角形的数一定是三角形数，因此只需判断五角形数和六角形数即可。判断一个数是否是五角形数又用到了二分。
+
+```c++
+int64_t pentagonal(int64_t n) {
+    return n * (3 * n - 1) / 2;
+}
+
+int64_t hexagonal(int64_t n) {
+    return n * (2 * n - 1);
+}
+
+int64_t binary_search(int64_t (*func)(int64_t), int64_t n, int64_t x) {
+    int64_t low = 0, high = n, mid;
+    while (low <= high) {
+        mid = (low + high) >> 1;
+        if (func(mid) == x) return mid;
+        if (func(mid) > x) high = mid - 1;
+        else low = mid + 1;
+    }
+    return -1;
+}
+
+int main() {
+    int64_t n = 144;
+    while (binary_search(pentagonal, 2 * n, hexagonal(n)) == -1) n++;
+    printf("%" PRId64 "\n", hexagonal(n));
+    return 0;
+}
+```
+
+**Problem 46.Goldbach’s other conjecture**
+
+思路：暴力循环即可。
+
+```c++
+
+int is_prime(int x) {
+    for (int n = 2; n * n < x; n++) {
+        if (x % n == 0) return 0;
+    }
+    return 1;
+}
+
+int main() {
+    for (int i = 3; i; i += 2) {
+        if (is_prime(i)) continue;
+        int flag = 1;
+        for (int j = 1; 2 * j * j < i && flag; j++) {
+            if (is_prime(i - 2 * j * j)) flag = 0;
+        }
+        if (flag) {
+            printf("%d\n", i);
+            return 0;
+        }
+    }
+    return 0;
+}
+```
+
+**Problem 47.Distinct primes factors**
+
+思路：先利用素数筛打个表，记录一下每个数的因子个数，之后再循环判断即可。
+
+```c++
+void init() {
+    for (int i = 2; i < MAX_N; i++) {
+        if (prime[i]) continue;
+        for (int j = i; j < MAX_N; j += i) {
+            prime[j] += 1;
+        }
+    }
+    return ;
+}
+
+int main() {
+    init();
+    for (int i = 2; i; i++) {
+        int flag = 1;
+        for (int j = 0; j < 4 && flag; j++) {
+            if (prime[i + j] != 4) flag = 0;
+        }
+        if (flag) {
+            printf("%d\n", i);
+            return 0;
+        }
+    }
+    return 0;
+}
+```
+
+**Problem 48.Self powers**
+
+思路：大数相乘和大数相加。
+
+```c++
+void sum(int *data) {
+    ans[0] = ans[0] > data[0] ? ans[0] : data[0];
+    for (int i = 1; i <= data[0]; i++) {
+        ans[i] += data[i];
+    }
+    for (int i = 1; i <= ans[0]; i++) {
+        if (ans[i] < 10) continue;
+        ans[i + 1] += ans[i] / 10;
+        ans[i] %= 10;
+        ans[0] += (i == ans[0]);
+    }
+    return ;
+}
+
+int main() {
+    for (int i = 1; i <= 1000; i++) {
+        memset(data, 0, sizeof(int) * MAX_N);
+        data[0] = data[1] = 1;
+        for (int j = 1; j <= i; j++) {
+            for (int k = 1; k <= data[0]; k++) {
+                data[k] *= i;
+            }
+            for (int k = 1; k <= data[0]; k++) {
+                if (data[k] < 10) continue;
+                data[k + 1] += data[k] / 10;
+                data[k] %= 10;
+                data[0] += (k == data[0]);
+            }
+        }
+        sum(data);
+    }
+    for (int i = 10; i >= 1; i--) {
+        printf("%d", ans[i]);
+    }
+    return 0;
+}
+```
+
+ **Problem 49.Self powers**
+
+思路：先利用素数筛打个表，然后循环判断即可。
+
+```c++
+void init() {
+    for (int i = 2; i * i <= MAX_N; i++) {
+        if (prime[i]) continue;
+        for (int j = i * i; j <= MAX_N; j += i) {
+            prime[j] = 1;
+        }
+    }
+    return ;
+}
+
+int is_valid(int i, int j, int k) {
+    int num1[10] = {0}, num2[10] = {0}, num3[10] = {0};
+    while (i) {
+        num1[i % 10] += 1;
+        i /= 10;
+    }
+    while (j) {
+        num2[j % 10] += 1;
+        j /= 10;
+    }
+    while (k) {
+        num3[k % 10] += 1;
+        k /= 10;
+    }
+    for (int i = 0; i < 10; i++) {
+        if (num1[i] != num2[i]) return 0;
+        if (num2[i] != num3[i]) return 0;
+    }
+    return 1;
+}
+
+int main() {
+    init();
+    for (int i = 1000; i <= MAX_N; i++) {
+        if (prime[i]) continue;
+        if (i == 1487) continue;
+        for (int j = i + 1; j <= MAX_N; j++) {
+            if (prime[j]) continue;
+            for (int k = j + 1; k <= MAX_N; k++) {
+                if (prime[k]) continue;
+                if ((k - j) != (j - i)) continue;
+                if (!is_valid(i, j, k)) continue;
+                printf("%d%d%d\n", i, j, k);
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+```
+
